@@ -1,6 +1,8 @@
 //import logo from './logo.svg';
 import './App.css';
 import React, { useState } from 'react';
+import axios from "axios";
+
 
  const testProducts=[
   {name:"pr1"},
@@ -66,6 +68,7 @@ class Product extends React.Component{
   }
 }
 
+/* using ref
 class Form extends React.Component{
   productInput=React.createRef();
   //ref is "Reacts way" of id
@@ -90,7 +93,33 @@ class Form extends React.Component{
       console.log(this.productInput.current.value);
   }
 }
+*/
+class Form extends React.Component{
+  state={productInput: 'a'}
+  render()
+  {
+    return(
+      <form action="" onSubmit={this.handleSubmit}>
+        <input 
+          value={this.state.productInput} 
+          onChange={event=>this.setState( {productInput: event.target.value})}
+          type="text" 
+          placeholder="which product"
+          required
+        /> 
+        <button>Details</button>
+      </form>
+    );
+  }
 
+    handleSubmit=(event)=>{
+      event.preventDefault(); //to avoid page refresh
+      console.log(this.state.productInput);
+  
+      axios.get('https://localhost:5001/product')
+        .then(res => this.props.productsChangeCB(res.data));
+    }
+}
 
 class App extends React.Component{
   /*
@@ -99,6 +128,11 @@ class App extends React.Component{
     this.state={products:testProducts}
   */
   state={products:testProducts};
+
+  logProducts = (ps) =>{
+    ps.map(p=>console.log(p));
+    this.setState({products: ps});
+  } 
 
   render()
   {
@@ -109,7 +143,7 @@ class App extends React.Component{
       </h1>
       <DisplayButton/>
       <ProductList title="List of... products!" products={this.state.products}/>
-       <Form/>
+       <Form productsChangeCB={this.logProducts}/>
     </div>
   );
   }
